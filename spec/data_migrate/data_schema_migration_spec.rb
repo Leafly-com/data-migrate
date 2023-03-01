@@ -6,6 +6,27 @@ describe DataMigrate::DataSchemaMigration do
     it "returns correct table name" do
       expect(subject.table_name).to eq("data_migrations")
     end
+
+    describe "data migrations table name configured" do
+      let(:data_migrations_table_name) { "my_app_data_template_migrations"}
+
+      before do
+        @before = DataMigrate.config.data_migrations_table_name
+        DataMigrate.configure do |config|
+          config.data_migrations_table_name = data_migrations_table_name
+        end
+      end
+
+      after do
+        DataMigrate.configure do |config|
+          config.data_migrations_table_name = @before
+        end
+      end
+
+      it "returns correct table name" do
+        expect(subject.table_name).to eq(data_migrations_table_name)
+      end
+    end
   end
 
   describe :index_name do
