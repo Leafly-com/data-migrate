@@ -1,30 +1,10 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe DataMigrate::DataMigrator do
-  let(:context) {
-    if (Rails::VERSION::MAJOR == 5)
-      DataMigrate::MigrationContext.new("spec/db/data")
-    else
-      DataMigrate::MigrationContext.new("spec/db/data-6.0")
-    end
-  }
-  let(:schema_context) {
-    if (Rails::VERSION::MAJOR == 5)
-      ActiveRecord::MigrationContext.new("spec/db/migrate/5.2")
-    else
-      ActiveRecord::MigrationContext.new("spec/db/migrate/6.0", ActiveRecord::Base.connection.schema_migration)
-    end
-  }
-
-  after do
-    begin
-      ActiveRecord::Migration.drop_table("data_migrations")
-      ActiveRecord::Migration.drop_table("schema_migrations")
-    rescue StandardError
-      nil
-    end
-  end
-
+  let(:context) { DataMigrate::MigrationContext.new("spec/db/data") }
+  let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ar_schema_migration) }
   let(:db_config) do
     {
       adapter: "sqlite3",
@@ -32,21 +12,22 @@ describe DataMigrate::DataMigrator do
     }
   end
 
-  describe :migrate do
-    before do
-      ActiveRecord::Base.establish_connection(db_config)
-      ActiveRecord::SchemaMigration.create_table
-    end
+  before do
+    ActiveRecord::Base.establish_connection(db_config)
+    DataMigrate::RailsHelper.schema_migration.create_table
+    DataMigrate::RailsHelper.data_schema_migration.create_table
+  end
 
-    after do
-      ActiveRecord::Migration.drop_table("data_migrations")
-      ActiveRecord::Migration.drop_table("schema_migrations")
-    end
+  after do
+    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+    ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
+  end
 
+  describe "migrate" do
     it "migrates existing file" do
       context.migrate(nil)
       context.migrations_status
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(2)
       expect(versions).to include("20091231235959")
       expect(versions).to include("20171231235959")
@@ -55,7 +36,7 @@ describe DataMigrate::DataMigrator do
     it "undo migration" do
       context.migrate(nil)
       context.run(:down, 20171231235959)
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
     end
@@ -72,7 +53,7 @@ describe DataMigrate::DataMigrator do
 
     it "runs a specific migration" do
       context.run(:up, 20171231235959)
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20171231235959")
     end
@@ -100,7 +81,7 @@ describe DataMigrate::DataMigrator do
       expect {
         context.rollback
       }.to output(/Undoing SuperUpdate/).to_stdout
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
     end
@@ -111,7 +92,7 @@ describe DataMigrate::DataMigrator do
       expect {
         context.rollback(2)
       }.to output(/Undoing SomeName/).to_stdout
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(0)
     end
 
@@ -120,8 +101,17 @@ describe DataMigrate::DataMigrator do
       expect {
         context.rollback(2)
       }.to output(/Undoing SomeName/).to_stdout
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(0)
+    end
+  end
+
+  # schema migration changed in Rails 7.2, from the connection to the pool object.
+  def ar_schema_migration
+    if ActiveRecord::Base.connection_pool.respond_to?(:schema_migration)
+      ActiveRecord::Base.connection_pool.schema_migration
+    else
+      ActiveRecord::Base.connection.schema_migration
     end
   end
 end

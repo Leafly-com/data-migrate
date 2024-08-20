@@ -1,5 +1,62 @@
 # Changelog
 
+# 11.0.0rc
+- Remove Ruby 3.0 from build matrix
+- Support Rails 7.2.0 https://github.com/ilyakatz/data-migrate/pull/312
+- Update gemfile.lock builds
+
+## 9.4.2
+- Fix db:prepare:with_data task
+
+## 9.4.1
+- Add db:prepare task
+
+## 9.4.0
+- Reset model schema cache before each data migration https://github.com/ilyakatz/data-migrate/pull/307
+- Run load_config rake task before db:migrate:with_data https://github.com/ilyakatz/data-migrate/pull/308
+
+## 9.3.0
+- Improve with_data Rake task for multiple database https://github.com/ilyakatz/data-migrate/pull/296
+
+## 9.2.0
+- Support Rails 7.1 https://github.com/ilyakatz/data-migrate/pull/278
+- Build and test against 7.1.0.rc1 https://github.com/ilyakatz/data-migrate/pull/286
+
+## 9.1.0
+
+- Fix a bug that caused `schema_sha1` in `ar_internal_metadata` to be reset to the `data_schema.rb` file. (#272)
+- Remove the need for empty data_schema files for non-primary databases. (#273)
+
+## [YANKED] 10.0.3.rc
+
+- Remove all travis references [leoarnold](https//:github.com/leoarnold)
+- Changing to rc because of ongoing discussion how to properly handle multiple database environments
+
+## [YANKED] 10.0.2
+
+Change "rails" dependencies to "railties"
+
+## [YANKED] 10.0.1
+
+- Bug fix for Rails 6 config [chaunce](https//:github.com/chaunce)
+- Railties bug fix by [opti](https://github.com/opti)
+
+## [YANKED] 10.0.0
+
+Releasing 10.0.0
+
+!!! Breaking changes !!!
+
+- This version introduces a breaking change which may lead to undesired
+behavior in multi-database environments. See https://github.com/ilyakatz/data-migrate/issues/181
+
+## [YANKED] 10.0.0.rc1
+
+- Changes by [chaunce](https//:github.com/chaunce)
+- Multiple databases support
+- Refactor to clean things up
+- Deprecate rails 5.2 support for real
+
 ## 9.0.0
 
 Ruby 3.2 support [mehanoid](https://github.com/mehanoid)

@@ -2,7 +2,7 @@
 
 - [![Version](http://img.shields.io/gem/v/data_migrate.svg?style=flat-square)](https://rubygems.org/gems/data_migrate)
 - [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://opensource.org/licenses/MIT)
-- [![Travis](https://img.shields.io/travis/ilyakatz/data-migrate.svg)](https://travis-ci.org/ilyakatz/data-migrate)
+- ![.github/workflows/build.yml](https://github.com/ilyakatz/data-migrate/actions/workflows/.github/workflows/build.yml/badge.svg)
 - [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 Run data migrations alongside schema migrations.
@@ -12,7 +12,7 @@ migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all your titles, this
 is the place to do it.
 
-![Travis](./screenshot.png)
+![directory tree example](./screenshot.png)
 
 ## Why should I use this?
 
@@ -36,7 +36,7 @@ table to track all migrations.
 
 ## Rails Support
 
-Support Rails 5.2 through 7.0
+Support Rails 6.1 through 7.2
 
 
 #### v1
@@ -96,7 +96,9 @@ Tasks work as they would with the 'vanilla' db version. The 'with_data' addition
 
 With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided. Again, going up, schema is given precedence. Down its data.
 
-`rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
+When using `rake db:migrate:with_data` migrations will be run in ascending order by their version. For example, if you have a data migration with version 20230410000000 and a schema migration with version 20230415000000, expect the data migration to run first.
+
+`rake db:migrate:status:with_data` provides an additional column to indicate which type of migration.
 
 ### Configuration
 
@@ -162,11 +164,20 @@ Then, in the Engine's `db/data` folder, you can add data migrations and run them
 Run tests for a specific version of Rails
 
 ```
-bundle exec appraisal install
-bundle exec appraisal rails-5.1 rspec
-bundle exec appraisal rails-5.2 rspec
-bundle exec appraisal rails-6.0 rspec
+
+bundle exec appraisal rails-6.1 rspec
+bundle exec appraisal rails-7.0 rspec
+bundle exec appraisal rails-7.1 rspec
+bundle exec appraisal rails-7.2 rspec
 ```
+
+## Releasing new version
+
+1. Create a new tag, eg `git tag 9.4.1`
+1. Go to https://github.com/ilyakatz/data-migrate/tags
+1. Click "Create release" under 9.4.1
+1. CLick "Generate release notes"
+1. Click "Publish release"
 
 ## Thanks
 

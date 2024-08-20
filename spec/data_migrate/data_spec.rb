@@ -4,12 +4,6 @@ require "spec_helper"
 
 describe DataMigrate::Data do
   let(:subject) { DataMigrate::Data }
-  let(:db_config) do
-    {
-      adapter: "sqlite3",
-      database: "spec/db/test.db"
-    }
-  end
   let(:fixture_file_timestamps) do
     %w[20091231235959 20101231235959 20111231235959]
   end
@@ -28,11 +22,6 @@ describe DataMigrate::Data do
   end
 
   describe :define do
-    before do
-      allow(DataMigrate::DataMigrator).
-        to receive(:db_config) { db_config }
-    end
-
     after do
       ActiveRecord::Migration.drop_table("data_migrations")
     end
@@ -66,7 +55,7 @@ describe DataMigrate::Data do
 
         sql_select = <<-SQL
           SELECT version
-          FROM #{DataMigrate::DataSchemaMigration.table_name}
+          FROM #{DataMigrate::RailsHelper.data_schema_migration.table_name}
         SQL
 
         db_list_data = ActiveRecord::Base.connection.

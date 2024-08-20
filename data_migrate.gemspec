@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
     activerecord
     railties
   ].each do |rails_gem|
-    s.add_dependency(rails_gem, '>= 6.0')
+    s.add_dependency(rails_gem, '>= 6.1')
   end
 
   s.add_development_dependency "appraisal"
@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec-core"
   s.add_development_dependency "pry"
   s.add_development_dependency "rb-readline"
-  s.add_development_dependency "sqlite3", "~> 1.3.6"
+  s.add_development_dependency "sqlite3"
   s.add_development_dependency "timecop"
   s.add_development_dependency "rubocop"
   s.add_development_dependency "overcommit"
